@@ -1,1 +1,1 @@
-dbweb-core1
+dbweb-core
