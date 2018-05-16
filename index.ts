@@ -1,6 +1,6 @@
 import axios, { AxiosPromise } from 'axios';
-import { join } from 'path';
-let RootPath: string = "/";
+import { resolve } from 'url';
+export let RootPath: string = "/";
 export function SetRootPath(val: string): void {
 	RootPath = val;
 }
@@ -14,7 +14,7 @@ export function APIGet<T>(eleName: string, methodName: string, signStr: string |
 	if (signStr != null) {
 		header._s = signStr;
 	}
-	const strURL = join(RootPath, eleName);
+	const strURL = resolve(RootPath, eleName);
 	return axios.get(strURL, {
 		headers: header,
 		params
@@ -27,7 +27,7 @@ export function APIPost<T>(eleName: string, methodName: string, signStr: string,
 	if (signStr != null) {
 		header._s = signStr;
 	}
-	return axios.post(join(RootPath, eleName), {
+	return axios.post(resolve(RootPath, eleName), {
 		data: param,
 		headers: header
 	});
