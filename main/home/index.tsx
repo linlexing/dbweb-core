@@ -193,4 +193,4 @@ const mapDispatchToProps = {
     openMenu: actions.doOpenMenu,
     hideMenu: actions.doHideMenu
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(withStyles(styles, { withTheme: true })(Home)));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles, { withTheme: true })(Home)));
