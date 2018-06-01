@@ -1,20 +1,18 @@
-import { createAction } from 'typesafe-actions';
+import { createAction } from "typesafe-actions";
 
-import { IElement } from '../model/element';
-import { IModuleList } from '../model/module';
-const doIniti = createAction('initi', resolve => {
-    return (data: {
-        modules: IModuleList,
-        apiRootPath: string
-    }) => resolve(data);
-})
+import { IElement } from "../model";
 
-const doAssignElements = createAction('doAssignElements', resolve => {
+const doInitiElements = createAction("[root]doInitiElements", resolve => {
     return (elements: IElement[]) => resolve(elements);
-})
+});
+const setDisplayLabel = createAction("[root]setDisplayLabel", resolve => {
+    return (label: string) => resolve(label);
+});
+const doSetVersion = createAction("[root]doSetVersion", resolve => {
+    return (ver: string) => resolve(ver);
+});
+const doSetMenu = createAction("[root]doSetMenu", resolve => {
+    return (data: { path: string; openOrClose: boolean }) => resolve(data);
+});
 
-const doSetIndex = createAction('doSetIndex', resolve => {
-    return (index: string) => resolve(index);
-})
-
-export { doIniti, doAssignElements, doSetIndex }
+export { doInitiElements, doSetVersion, setDisplayLabel, doSetMenu };
