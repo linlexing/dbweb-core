@@ -69,12 +69,12 @@ export const styles = (theme: Theme) => ({
         alignItems: "center",
         justifyContent: "flex-end",
         padding: "0 8px",
-        backgroundColor: "rgba(0, 40, 77, 1)",
-        color: "white",
+        // backgroundColor: "rgba(0, 40, 77, 1)",
+        // color: "white",
         ...theme.mixins.toolbar
     },
     drawerPaper: {
-        backgroundColor: "rgb(0, 21, 41)",
+        // backgroundColor: "rgb(0, 21, 41)",
         position: "relative" as "relative",
         width: drawerWidth
     },

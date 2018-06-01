@@ -66,11 +66,13 @@ const root = (state: IRootStore = { version: "0" }, action: Actions): IRootStore
                 ...state,
                 version: action.payload
             };
-        case getType(actions.doInitiElements):
+        case getType(actions.doLoginedIniti):
             return {
                 ...state,
-                elements: action.payload,
-                menus: buildMenusFromElements(action.payload)
+                elements: action.payload.elements,
+                menus: buildMenusFromElements(action.payload.elements),
+                userName: action.payload.userName,
+                logined: true
             };
         case getType(actions.setDisplayLabel):
             return {

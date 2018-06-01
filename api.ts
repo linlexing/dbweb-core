@@ -12,7 +12,9 @@ axios.interceptors.response.use(undefined, error => {
             .then(() => {
                 return axios(originalRequest);
             })
-            .catch(() => {
+            .catch(err => {
+                // tslint:disable:no-console
+                console.log(err);
                 alert("not login");
             });
     }
@@ -29,6 +31,7 @@ export function APIGet<T>(eleName: string, methodName: string, signStr?: string,
     }
     const strURL = resolve(apiRootPath, eleName);
     return axios.get(strURL, {
+        withCredentials: true,
         headers: header,
         params
     });
@@ -40,6 +43,7 @@ export function APIPost<T>(eleName: string, methodName: string, signStr?: string
         header._s = signStr;
     }
     return axios.post(resolve(apiRootPath, eleName), {
+        withCredentials: true,
         data: param,
         headers: header
     });

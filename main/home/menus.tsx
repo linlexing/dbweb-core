@@ -1,4 +1,14 @@
-import { Collapse, Icon, ListItemText, MenuItem, MenuList, Theme, WithStyles, withStyles } from "@material-ui/core";
+import {
+    Collapse,
+    Icon,
+    List,
+    ListItem,
+    ListItemText,
+    ListSubheader,
+    Theme,
+    WithStyles,
+    withStyles
+} from "@material-ui/core";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
@@ -11,29 +21,43 @@ interface IMenusProps extends WithStyles<clsNames>, RouteComponentProps<any> {
     setMenu: (data: { path: string; openOrClose: boolean }) => any;
 }
 const styles = (theme: Theme) => ({
-    menuItem: {
-        marginRight: 24,
-        "&:hover": {
-            backgroundColor: "#20a8d8"
-        },
-        "&:focus": {
-            backgroundColor: theme.palette.primary.dark,
-            "& $primary, & $icon": {
-                color: theme.palette.common.white
-            }
-        }
+    item: {
+        paddingTop: 10,
+        paddingBottom: 10
+        // marginRight: 24,
+        // "&:hover": {
+        //     backgroundColor: "#20a8d8"
+        // },
+        // "&:focus": {
+        //     backgroundColor: theme.palette.primary.dark,
+        //     "& $primary, & $icon": {
+        //         color: theme.palette.common.white
+        //     }
+        // }
     },
     primary_sel: {
-        color: theme.palette.common.white
+        fontSize: 14,
+        color: "#2196f3",
+        // fontWeight: "bold" as "bold"
+        fontWeight: theme.typography.fontWeightMedium
+        // color: theme.palette.common.white
     },
     primary: {
-        color: "rgba(255, 255, 255, 0.647058823529412)"
+        fontSize: 14
+        // color: "rgba(255, 255, 255, 0.647058823529412)"
+    },
+    primary_cate: {
+        fontSize: 14,
+        fontWeight: "bold" as "bold"
+        // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     icon: {
-        color: "rgba(255, 255, 255, 0.647058823529412)"
+        fontSize: 14,
+        color: theme.palette.grey["400"]
+        // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     menuList: {
-        paddingLeft: 12
+        // paddingLeft: 12
     }
 });
 type clsNames = keyof ReturnType<typeof styles>;
@@ -51,27 +75,27 @@ function clearText(val: string) {
     return val;
 }
 const Menus: React.SFC<IMenusProps> = props => {
-    const { classes, menus, setMenu, location, theme } = props;
+    const { classes, menus, setMenu } = props;
     const toItem = (item: IItem) => {
         const MyLink = (p: any) => <Link to={item.url} {...p} />;
         const sel = decodeURI(location.pathname) === decodeURI(item.url);
-        const selColor = theme ? theme.palette.primary.dark : "";
+        // const selColor = theme ? theme.palette.primary.dark : "";
         return (
-            <MenuItem
+            <ListItem
                 key={item.key}
                 button={true}
-                selected={sel}
+                // selected={sel}
                 component={MyLink}
-                style={{ backgroundColor: sel ? selColor : "" }}
-                classes={{ root: classes.menuItem }}>
+                // style={{ backgroundColor: sel ? selColor : "" }}
+                classes={{ root: classes.item }}>
                 <ListItemText
                     primary={clearText(item.label)}
                     classes={{ primary: sel ? classes.primary_sel : classes.primary }}
                 />
-            </MenuItem>
+            </ListItem>
         );
     };
-    const toList = (node: ICategory): JSX.Element | null => {
+    const toList = (node: ICategory, flat = false): JSX.Element | null => {
         if (!node) {
             return null;
         }
@@ -79,29 +103,40 @@ const Menus: React.SFC<IMenusProps> = props => {
             if (isItem(val)) {
                 return toItem(val);
             } else {
-                return toList(val);
+                return toList(val, true);
             }
         });
         const click = () => {
             setMenu({ path: node.path, openOrClose: !node.open });
         };
-        return (
-            <MenuList key={node.key} disablePadding={true}>
-                <MenuItem button={true} onClick={click} key={node.key} classes={{ root: classes.menuItem }}>
-                    <ListItemText primary={clearText(node.label)} classes={{ primary: classes.primary }} />
-                    {node.open ? (
-                        <Icon className={classes.icon}>expand_less</Icon>
-                    ) : (
-                        <Icon className={classes.icon}>expand_more></Icon>
-                    )}
-                </MenuItem>
-                <Collapse in={node.open} timeout="auto" unmountOnExit={true} className={classes.menuList}>
-                    <MenuList component="div" disablePadding={true}>
-                        {itemlist}
-                    </MenuList>
-                </Collapse>
-            </MenuList>
-        );
+        let list;
+        if (flat) {
+            list = (
+                <List key={node.key} disablePadding={true}>
+                    <ListSubheader>{clearText(node.label)}</ListSubheader>
+                    {itemlist}
+                </List>
+            );
+        } else {
+            list = (
+                <List key={node.key} disablePadding={true}>
+                    <ListItem button={true} onClick={click} key={node.key} classes={{ root: classes.item }}>
+                        <ListItemText primary={clearText(node.label)} classes={{ primary: classes.primary_cate }} />
+                        {node.open ? (
+                            <Icon className={classes.icon}>expand_less</Icon>
+                        ) : (
+                            <Icon className={classes.icon}>expand_more></Icon>
+                        )}
+                    </ListItem>
+                    <Collapse in={node.open} timeout="auto" unmountOnExit={true} className={classes.menuList}>
+                        <List component="div" disablePadding={true}>
+                            {itemlist}
+                        </List>
+                    </Collapse>
+                </List>
+            );
+        }
+        return list;
     };
     return (
         <>

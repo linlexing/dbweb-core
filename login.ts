@@ -5,13 +5,14 @@ import { APIGet } from "./api";
 import { pushElement } from "./history";
 import { IElement } from "./model";
 import * as actions from "./root/action";
-import { store } from "./store";
+import { loadStoreAndReplaceReducer, resetStore, store } from "./store";
 
 interface ILoginParam {
     userName: string;
     password: string;
 }
-export let loginPromise: { resolve: (value?: any) => void; reject: (reason?: any) => void } | undefined;
+let loginPromise: { resolve: (value?: any) => void; reject: (reason?: any) => void } | undefined;
+let loginNext: string;
 export interface ILoginResult {
     IndexElement: string;
     PublicEles: IElement[];
@@ -22,14 +23,27 @@ export interface ILoginResult {
 export function getPublicElement(): AxiosPromise<IElement[]> {
     return APIGet<IElement[]>("login", "getPublicElement");
 }
+export function isLogined(): AxiosPromise<string> {
+    return APIGet<string>("login", "isLogined");
+}
 
 export function login(param: ILoginParam) {
     return APIGet<ILoginResult>("login", "login", undefined, param).then(val => {
-        store.dispatch(actions.doInitiElements(val.data.Elements));
+        // 重新调入redux 的 store
+        store.dispatch(resetStore(loadStoreAndReplaceReducer(param.userName, val.data.Elements)));
+        store.dispatch(
+            actions.doLoginedIniti({
+                elements: val.data.Elements,
+                userName: param.userName
+            })
+        );
         store.dispatch(actions.setDisplayLabel(val.data.ProjectLabel));
         // 如果有Promeise，说明是中途插入认证，需要回调resolve来重新发起ajzx请求
         if (loginPromise) {
             loginPromise.resolve();
+        } else if (loginNext) {
+            // 如果有指定的跳转url
+            store.dispatch(push(loginNext));
         } else {
             // 否则是转向默认的index页面
             store.dispatch(pushElement(val.data.IndexElement));
@@ -47,6 +61,10 @@ export function showLogin() {
         loginPromise = undefined;
         store.dispatch(push(oldurl));
     });
+}
+export function showLoginAfterToNext(next: string) {
+    loginNext = next;
+    store.dispatch(push(loginUrl()));
 }
 export function loginUrl() {
     return "/front/login";
