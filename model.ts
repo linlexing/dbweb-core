@@ -10,7 +10,6 @@ export interface IElement {
     SignStr?: string;
 }
 export interface IModule {
-    name: string;
     reducer: Reducer;
     component: React.ComponentType;
 }

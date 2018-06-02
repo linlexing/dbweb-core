@@ -16,16 +16,20 @@ import {
 
 import { getPublicElement, isLogined, loginUrl, showLoginAfterToNext } from "./login";
 import home from "./main/home/reducer";
-import { IElement, IModuleList } from "./model";
+import { IElement } from "./model";
 import { doSetVersion } from "./root/action";
 import root, { IRootStore } from "./root/reducer";
 
 // tslint:disable-next-line:no-var-requires
 const config = require("../../../package.json");
-export let modules: IModuleList;
+export let modules: object;
 export let apiRootPath: string;
 export let store: Store;
 export let history: History;
+interface IElementProps {
+    element: string;
+    [key: string]: any;
+}
 const loadState = (userName: string) => {
     try {
         // 也可以容错一下不支持localStorage的情况下，用其他本地存储
@@ -78,8 +82,6 @@ function createReducer(asyncReducers?: any) {
         ...asyncReducers
     });
 }
-let reducers: any = {};
-let enhancers: StoreEnhancer<Store<any, AnyAction>, {}> | undefined;
 let allReducers: any;
 let publicEles: IElement[];
 function createNamedWrapperReducer(reducerFunction: (state: any, action: any) => void, reducerName: string) {
@@ -103,9 +105,7 @@ export function resetStore(state: any) {
         payload: state
     };
 }
-function commonReducer(state: any = {}, action: any) {
-    return state;
-}
+
 function rootReducer(state: any = {}, action: any) {
     if (action.type === TYPE_RESET_STORE) {
         return { ...state, ...action.payload };
@@ -115,67 +115,67 @@ function rootReducer(state: any = {}, action: any) {
 }
 // 登录后，真正调取上次保存的状态
 export function loadStoreAndReplaceReducer(userName: string, eles: IElement[]) {
-    reducers = {};
-    _.union(eles, publicEles).forEach(val => {
+    let initStore = loadState(userName);
+    if (initStore) {
+        initStore = _.pick(initStore, "root", "home", "router", ..._.map(eles, val => val.Name));
+    }
+    refreshReducer(_.union(eles, publicEles));
+    return initStore;
+}
+function refreshReducer(eles: IElement[]) {
+    const reducers = {};
+
+    eles.forEach(val => {
         if (modules[val.Controller] && modules[val.Controller].reducer) {
             reducers[val.Name] = createNamedWrapperReducer(modules[val.Controller].reducer, val.Name);
         }
     });
-    let initStore = loadState(userName);
-    // 如果store中的状态没有对应的reducer，则创建一个，防止redux自动剪枝
-    if (initStore) {
-        initStore = _.pick(initStore, "root", "home", "router", ..._.map(eles, val => val.Name));
-    }
     allReducers = createReducer(reducers);
-    return initStore;
-    // store = createStore(createReducer(reducers), initStore, enhancers);
 }
-export async function register(mds: IModuleList, rootPath: string) {
+
+export async function register(mds: object, rootPath: string) {
     modules = mds;
     apiRootPath = rootPath;
     history = createHistory();
 
-    // Build the middleware for intercepting and dispatching navigation actions
     const middleware = routerMiddleware(history);
-    reducers.login = createNamedWrapperReducer(modules.login.reducer, "login");
     // Add the reducer to your store on the `router` key
     // Also apply our middleware for navigating
     // tslint:disable-next-line:no-string-literal
     const composeEnhancers = window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] || compose;
-    enhancers = composeEnhancers(applyMiddleware(middleware));
     await getPublicElement().then(data => {
         publicEles = data.data;
     });
-    await isLogined().then(data => {
-        let initStore = null;
-        if (data.data) {
-            initStore = loadState(data.data);
-            // 如果store中的状态没有对应的reducer，则创建一个，防止redux自动剪枝
-            if (initStore) {
-                _.without(Object.keys(initStore), "root", "home", "router").forEach(
-                    val => (reducers[val] = reducers[val] || commonReducer)
-                );
-            }
-            allReducers = createReducer(reducers);
 
-            store = createStore(rootReducer, { ...initStore, root: { ...initStore.root, publicEles } }, enhancers);
-        } else {
-            allReducers = createReducer(reducers);
-            store = createStore(rootReducer, { root: { version: "0", publicEles } } as any, enhancers);
-        }
-        if (!store.getState().root.logined) {
-            const oldUrl = window.location.pathname;
-            if (oldUrl !== loginUrl()) {
-                showLoginAfterToNext(oldUrl);
-            }
-        }
+    await isLogined().then(data => {
+        doInitStore(data.data, composeEnhancers(applyMiddleware(middleware)));
     });
 }
 
-interface IElementProps {
-    element: string;
-    [key: string]: any;
+function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAction>, {}> | undefined) {
+    let initStore = null;
+    if (userName) {
+        initStore = loadState(userName);
+        let eles = publicEles;
+        // 如果store中的状态没有对应的reducer，则创建一个，防止redux自动剪枝
+        if (initStore) {
+            // 从elements中重建
+            eles = [...eles, ...initStore.root.elements];
+        }
+        refreshReducer(eles);
+        store = createStore(rootReducer, { ...initStore, root: { ...initStore.root, publicEles } }, enhancers);
+    } else {
+        refreshReducer(publicEles);
+        store = createStore(rootReducer, { root: { version: "0", publicEles } } as any, enhancers);
+    }
+    if (!store.getState().root.logined) {
+        const oldUrl = window.location.pathname;
+        if (oldUrl !== loginUrl()) {
+            showLoginAfterToNext(oldUrl);
+        }
+    }
 }
+
 function nameAction(action: any, name: string) {
     return { ...action, name };
 }

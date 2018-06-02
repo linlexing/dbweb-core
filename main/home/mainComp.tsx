@@ -8,7 +8,7 @@ export function MainComponent(element: IElement) {
     const module = modules[element.Controller];
     class Rev extends React.PureComponent {
         public render() {
-            const Mod = module ? module.component : undefined;
+            const Mod = module ? module : undefined;
             return (
                 <ElementProvider value={element.Name}>
                     {Mod ? (
