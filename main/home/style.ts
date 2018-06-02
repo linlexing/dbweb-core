@@ -44,9 +44,12 @@ export const styles = (theme: Theme) => ({
         display: "none"
     },
     content: {
+        display: "flex",
+        flexDirection: "column" as "column",
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: theme.spacing.unit * 3,
+        // padding: theme.spacing.unit * 3,
+        padding: 0,
         transition: theme.transitions.create("margin", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen

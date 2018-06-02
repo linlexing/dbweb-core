@@ -17,11 +17,11 @@ interface IProps {
 const Main: React.SFC<IProps> = props => {
     const eLogin = _.find(props.elements, { Name: "login" });
     if (eLogin) {
-        const InnerLogin = MainComponent(eLogin);
-
         return (
             <Switch>
-                <Route key="login" path={loginUrl()} component={InnerLogin} />
+                <Route key="login" path={loginUrl()}>
+                    <MainComponent element={eLogin} />
+                </Route>
                 <Route key="other" component={Home} />
             </Switch>
         );

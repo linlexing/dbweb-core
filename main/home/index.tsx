@@ -80,7 +80,6 @@ const Home: React.SFC<IHomeProps> = props => {
                 <Divider />
                 <Menus />
             </Drawer>
-            )
             <main
                 className={classNames(classes.content, classes[`content-left`], {
                     [classes.contentShift]: menuOpen,
@@ -90,8 +89,11 @@ const Home: React.SFC<IHomeProps> = props => {
                 <Switch>
                     {elements &&
                         elements.map<JSX.Element>((val): any => {
-                            const Comp = MainComponent(val);
-                            return <Route key={val.Name} path={"/front/" + val.Name} component={Comp} />;
+                            return (
+                                <Route key={val.Name} path={"/front/" + val.Name}>
+                                    <MainComponent element={val} />
+                                </Route>
+                            );
                         })}
                     <Route key="not found" component={NotFound} />
                 </Switch>
