@@ -10,7 +10,7 @@ export function MainComponent(element: IElement) {
         public render() {
             const Mod = module ? module : undefined;
             return (
-                <ElementProvider value={element.Name}>
+                <ElementProvider value={{ element: element.Name }}>
                     {Mod ? (
                         <Mod {...this.props} />
                     ) : (

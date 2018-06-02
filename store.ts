@@ -10,10 +10,13 @@ import {
     compose,
     createStore,
     Dispatch,
+    Reducer,
     Store,
     StoreEnhancer
 } from "redux";
+import { withElement } from "src/dbweb-core/withElement";
 
+import { withReducer } from "./eleContext";
 import { getPublicElement, isLogined, loginUrl, showLoginAfterToNext } from "./login";
 import home from "./main/home/reducer";
 import { IElement } from "./model";
@@ -213,5 +216,12 @@ export function eleConnect(
             return callMapDispatch(disph, ownProps);
         };
     }
-    return connect(mapState, mapDispatch);
+    return compose(withElement, connect(mapState, mapDispatch));
+}
+export function eleComponent(
+    mapStateToProps: null | ((state: any, rootState?: any, ownProps?: any) => any),
+    mapDispatchToProps?: object | ((dispatch: Dispatch, ownProps?: any) => any),
+    reducer?: Reducer
+) {
+    return compose(withReducer(reducer), eleConnect(mapStateToProps, mapDispatchToProps));
 }
