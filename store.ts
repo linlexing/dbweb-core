@@ -108,8 +108,6 @@ function commonReducer(state: any = {}, action: any) {
 }
 function rootReducer(state: any = {}, action: any) {
     if (action.type === TYPE_RESET_STORE) {
-        // tslint:disable:no-console
-        console.log(state, action.payload);
         return { ...state, ...action.payload };
     } else {
         return allReducers(state, action);
@@ -139,7 +137,7 @@ export async function register(mds: IModuleList, rootPath: string) {
 
     // Build the middleware for intercepting and dispatching navigation actions
     const middleware = routerMiddleware(history);
-    reducers.login = modules.login.reducer;
+    reducers.login = createNamedWrapperReducer(modules.login.reducer, "login");
     // Add the reducer to your store on the `router` key
     // Also apply our middleware for navigating
     // tslint:disable-next-line:no-string-literal
@@ -159,10 +157,11 @@ export async function register(mds: IModuleList, rootPath: string) {
                 );
             }
             allReducers = createReducer(reducers);
-            store = createStore(rootReducer, initStore, enhancers);
+
+            store = createStore(rootReducer, { ...initStore, root: { ...initStore.root, publicEles } }, enhancers);
         } else {
             allReducers = createReducer(reducers);
-            store = createStore(rootReducer, enhancers);
+            store = createStore(rootReducer, { root: { version: "0", publicEles } } as any, enhancers);
         }
         if (!store.getState().root.logined) {
             const oldUrl = window.location.pathname;
@@ -181,21 +180,37 @@ function nameAction(action: any, name: string) {
     return { ...action, name };
 }
 export function eleConnect(
-    mapStateToProps: (state: any, dynamicState: any, ownProps?: any) => any,
-    mapDispatchToProps?: (dispatch: Dispatch, ownProps?: any) => any
+    mapStateToProps: null | ((state: any, rootState?: any, ownProps?: any) => any),
+    mapDispatchToProps?: object | ((dispatch: Dispatch, ownProps?: any) => any)
 ) {
-    const mapState = (state: any, ownProps: IElementProps) => {
-        return mapStateToProps(state, state[ownProps.element], ownProps);
-    };
+    const mapState = mapStateToProps
+        ? (state: any, ownProps: IElementProps) => {
+              return mapStateToProps(state[ownProps.element], state, ownProps);
+          }
+        : null;
     let mapDispatch;
     if (mapDispatchToProps) {
+        let callMapDispatch: (dispatch: Dispatch, ownProps?: any) => any;
+        // 如果是对象，则创建一个包装的函数
+        if (typeof mapDispatchToProps === "object") {
+            callMapDispatch = (dispatch, ownProps) =>
+                _.mapValues(mapDispatchToProps, val => {
+                    // tslint:disable-next-line:only-arrow-functions
+                    return (...rest: any[]) => {
+                        dispatch(val(...rest));
+                    };
+                });
+        } else {
+            callMapDispatch = mapDispatchToProps;
+        }
         mapDispatch = (dispatch: Dispatch, ownProps: IElementProps) => {
             const disph = (action: AnyAction) => {
                 const ac = nameAction(action, ownProps.element);
                 dispatch(ac);
                 return ac;
             };
-            return mapDispatchToProps(disph, ownProps);
+
+            return callMapDispatch(disph, ownProps);
         };
     }
     return connect(mapState, mapDispatch);
