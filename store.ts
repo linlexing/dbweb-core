@@ -1,8 +1,8 @@
-import { History } from "history";
-import createHistory from "history/createBrowserHistory";
-import * as _ from "lodash";
-import { connect } from "react-redux";
-import { routerMiddleware, routerReducer } from "react-router-redux";
+import { History } from 'history';
+import createHistory from 'history/createBrowserHistory';
+import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { routerMiddleware, routerReducer } from 'react-router-redux';
 import {
     AnyAction,
     applyMiddleware,
@@ -13,18 +13,18 @@ import {
     Reducer,
     Store,
     StoreEnhancer
-} from "redux";
-import { withElement } from "src/dbweb-core/withElement";
+} from 'redux';
+import { withElement } from 'src/dbweb-core/withElement';
 
-import { withReducer } from "./eleContext";
-import { getPublicElement, isLogined, loginUrl, showLoginAfterToNext } from "./login";
-import home from "./main/home/reducer";
-import { IElement } from "./model";
-import { doSetVersion } from "./root/action";
-import root, { IRootStore } from "./root/reducer";
+import { withReducer } from './eleContext';
+import { getPublicElement, isLogined, loginUrl, showLoginAfterToNext } from './login';
+import home from './main/home/reducer';
+import { IElement } from './model';
+import { doSetVersion } from './root/action';
+import root, { IRootStore } from './root/reducer';
 
 // tslint:disable-next-line:no-var-requires
-const config = require("../../../package.json");
+const config = require('../../../package.json');
 export let modules: object;
 export let apiRootPath: string;
 export let store: Store;
@@ -36,7 +36,7 @@ interface IElementProps {
 const loadState = (userName: string) => {
     try {
         // 也可以容错一下不支持localStorage的情况下，用其他本地存储
-        const serializedState = localStorage.getItem("state." + userName);
+        const serializedState = localStorage.getItem('state.' + userName);
         if (serializedState === null) {
             return undefined;
         } else {
@@ -64,8 +64,8 @@ const saveState = (state: any) => {
             return;
         }
         // login有敏感信息，不保存
-        const serializedState = JSON.stringify(_.omit(state, "login"));
-        localStorage.setItem("state." + userName, serializedState);
+        const serializedState = JSON.stringify(_.omit(state, 'login'));
+        localStorage.setItem('state.' + userName, serializedState);
     } catch (err) {
         // ...错误处理
         alert(err);
@@ -101,7 +101,7 @@ function createNamedWrapperReducer(reducerFunction: (state: any, action: any) =>
 //     reducers[name] = createNamedWrapperReducer(reducer, name);
 //     store.replaceReducer(createReducer(reducers));
 // }
-const TYPE_RESET_STORE = "[root]TYPE_RESET_STORE";
+const TYPE_RESET_STORE = '[root]TYPE_RESET_STORE';
 export function resetStore(state: any) {
     return {
         type: TYPE_RESET_STORE,
@@ -120,7 +120,7 @@ function rootReducer(state: any = {}, action: any) {
 export function loadStoreAndReplaceReducer(userName: string, eles: IElement[]) {
     let initStore = loadState(userName);
     if (initStore) {
-        initStore = _.pick(initStore, "root", "home", "router", ..._.map(eles, val => val.Name));
+        initStore = _.pick(initStore, 'root', 'home', 'router', ..._.map(eles, val => val.Name));
     }
     refreshReducer(_.union(eles, publicEles));
     return initStore;
@@ -145,7 +145,7 @@ export async function register(mds: object, rootPath: string) {
     // Add the reducer to your store on the `router` key
     // Also apply our middleware for navigating
     // tslint:disable-next-line:no-string-literal
-    const composeEnhancers = window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] || compose;
+    const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
     await getPublicElement().then(data => {
         publicEles = data.data;
     });
@@ -169,13 +169,15 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
         store = createStore(rootReducer, { ...initStore, root: { ...initStore.root, publicEles } }, enhancers);
     } else {
         refreshReducer(publicEles);
-        store = createStore(rootReducer, { root: { version: "0", publicEles } } as any, enhancers);
+        store = createStore(rootReducer, { root: { version: '0', publicEles } } as any, enhancers);
     }
     if (!store.getState().root.logined) {
-        const oldUrl = window.location.pathname;
-        if (oldUrl !== loginUrl()) {
-            showLoginAfterToNext(oldUrl);
+        let oldUrl;
+
+        if (oldUrl !== loginUrl() || oldUrl !== '/') {
+            oldUrl = window.location.pathname;
         }
+        showLoginAfterToNext(oldUrl);
     }
 }
 
@@ -195,7 +197,7 @@ export function eleConnect(
     if (mapDispatchToProps) {
         let callMapDispatch: (dispatch: Dispatch, ownProps?: any) => any;
         // 如果是对象，则创建一个包装的函数
-        if (typeof mapDispatchToProps === "object") {
+        if (typeof mapDispatchToProps === 'object') {
             callMapDispatch = (dispatch, ownProps) =>
                 _.mapValues(mapDispatchToProps, val => {
                     // tslint:disable-next-line:only-arrow-functions

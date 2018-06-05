@@ -1,27 +1,30 @@
-import { ActionType, getType } from "typesafe-actions";
+import { ActionType, getType } from 'typesafe-actions';
 
-import { elementRouterURL, IElement } from "../model";
-import * as actions from "./action";
-import { Category, ICategory, isItem, setMenuOpenOrClose } from "./list";
+import { elementRouterURL, IDept, IElement } from '../model';
+import * as actions from './action';
+import { Category, ICategory, isItem, setMenuOpenOrClose } from './list';
 
 export interface IRootStore {
     readonly version: string;
     readonly displayLabel?: string;
     readonly logined?: boolean;
     readonly userName?: string;
+    readonly dept?: IDept;
+    readonly brand?: string;
+    readonly serviceVersion?: number;
     readonly publicEles?: ReadonlyArray<IElement>;
     readonly elements?: ReadonlyArray<IElement>;
     readonly menus?: ICategory;
 }
 function pathJoin(dir: string, name: string) {
-    return dir === "" ? name : dir + "/" + name;
+    return dir === '' ? name : dir + '/' + name;
 }
 // 根据ele返回菜单项，自动根据category生成层次结构
 function buildMenusFromElements(eles: IElement[]): ICategory {
-    const tree = new Category("root", "root", "");
+    const tree = new Category('root', 'root', '');
     let keyNum = 0;
     const addnode = (obj: IElement) => {
-        const splitpath = obj.Category.replace(/^\/|\/$/g, "").split("/");
+        const splitpath = obj.Category.replace(/^\/|\/$/g, '').split('/');
         let ptr = tree;
         for (const val of splitpath) {
             let node = ptr.findNode(val) as Category;
@@ -33,7 +36,7 @@ function buildMenusFromElements(eles: IElement[]): ICategory {
         }
         return ptr;
     };
-    eles.sort((a, b) => (a.Category + "/" + a.Label).localeCompare(b.Category + "/" + b.Label)).forEach(val => {
+    eles.sort((a, b) => (a.Category + '/' + a.Label).localeCompare(b.Category + '/' + b.Label)).forEach(val => {
         const c = addnode(val);
         c.addNode({
             label: val.Label,
@@ -59,7 +62,7 @@ function buildMenusFromElements(eles: IElement[]): ICategory {
         })
     };
 }
-const root = (state: IRootStore = { version: "0" }, action: Actions): IRootStore => {
+const root = (state: IRootStore = { version: '0' }, action: Actions): IRootStore => {
     switch (action.type) {
         case getType(actions.doSetVersion):
             return {
@@ -72,7 +75,10 @@ const root = (state: IRootStore = { version: "0" }, action: Actions): IRootStore
                 elements: action.payload.elements,
                 menus: buildMenusFromElements(action.payload.elements),
                 userName: action.payload.userName,
-                logined: true
+                dept: action.payload.dept,
+                logined: true,
+                serviceVersion: action.payload.version,
+                brand: action.payload.brand
             };
         case getType(actions.setDisplayLabel):
             return {
@@ -84,7 +90,7 @@ const root = (state: IRootStore = { version: "0" }, action: Actions): IRootStore
                 ...state,
                 menus: setMenuOpenOrClose(
                     state.menus as ICategory,
-                    action.payload.path.replace(/^\/|\/$/g, "").split("/"),
+                    action.payload.path.replace(/^\/|\/$/g, '').split('/'),
                     action.payload.openOrClose
                 )
             };

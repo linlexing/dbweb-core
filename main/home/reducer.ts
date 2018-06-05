@@ -1,15 +1,19 @@
-import { ActionType, getType } from "typesafe-actions";
+import { ActionType, getType } from 'typesafe-actions';
 
-import * as actions from "./action";
+import * as actions from './action';
 
 export interface IHomeStore {
     readonly menuOpen: boolean;
+    readonly userMenuOpen: boolean;
     readonly elementState: {};
 }
 
 type Actions = ActionType<typeof actions>;
 
-export default (state: IHomeStore = { menuOpen: true, elementState: {} }, action: Actions): IHomeStore => {
+export default (
+    state: IHomeStore = { menuOpen: true, elementState: {}, userMenuOpen: false },
+    action: Actions
+): IHomeStore => {
     switch (action.type) {
         case getType(actions.doOpenMenu):
             return {
@@ -21,6 +25,12 @@ export default (state: IHomeStore = { menuOpen: true, elementState: {} }, action
                 ...state,
                 menuOpen: false
             };
+        case getType(actions.doToggleUserMenu):
+            return {
+                ...state,
+                userMenuOpen: action.payload
+            };
+
         default:
             return state;
     }

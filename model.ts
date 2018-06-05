@@ -1,6 +1,10 @@
-import * as React from "react";
-import { Reducer } from "redux";
-
+import * as React from 'react';
+import { Reducer } from 'redux';
+export interface IDept {
+    Code: string;
+    Name: string;
+    Level: number;
+}
 export interface IElement {
     Name: string;
     Label: string;
@@ -17,5 +21,5 @@ export interface IModuleList {
     [key: string]: IModule;
 }
 export function elementRouterURL(eleName: string): string {
-    return "/front/" + encodeURIComponent(eleName);
+    return '/front/' + encodeURIComponent(eleName);
 }

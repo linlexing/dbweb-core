@@ -8,13 +8,14 @@ import {
     Theme,
     WithStyles,
     withStyles
-} from "@material-ui/core";
-import * as React from "react";
-import { connect } from "react-redux";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+} from '@material-ui/core';
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
-import * as actions from "../../root/action";
-import { ICategory, IItem, isItem } from "../../root/list";
+import * as actions from '../../root/action';
+import { ICategory, IItem, isItem } from '../../root/list';
+import { clearText } from './lib';
 
 interface IMenusProps extends WithStyles<clsNames>, RouteComponentProps<any> {
     menus: ICategory;
@@ -37,9 +38,9 @@ const styles = (theme: Theme) => ({
     },
     primary_sel: {
         fontSize: 14,
-        color: "#2196f3",
+        color: '#2196f3',
         // fontWeight: "bold" as "bold"
-        fontWeight: theme.typography.fontWeightMedium
+        fontWeight: 'bold' as 'bold'
         // color: theme.palette.common.white
     },
     primary: {
@@ -48,12 +49,12 @@ const styles = (theme: Theme) => ({
     },
     primary_cate: {
         fontSize: 14,
-        fontWeight: "bold" as "bold"
+        fontWeight: 'bold' as 'bold'
         // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     icon: {
         fontSize: 14,
-        color: theme.palette.grey["400"]
+        color: theme.palette.grey['400']
         // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     menuList: {
@@ -67,13 +68,7 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = {
     setMenu: actions.doSetMenu
 };
-const labelMatch = /^[0-9]{2}\./;
-function clearText(val: string) {
-    if (labelMatch.test(val)) {
-        return val.substr(3);
-    }
-    return val;
-}
+
 const Menus: React.SFC<IMenusProps> = props => {
     const { classes, menus, setMenu } = props;
     const toItem = (item: IItem) => {
