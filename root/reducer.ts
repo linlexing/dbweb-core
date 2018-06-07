@@ -15,6 +15,9 @@ export interface IRootStore {
     readonly publicEles?: ReadonlyArray<IElement>;
     readonly elements?: ReadonlyArray<IElement>;
     readonly menus?: ICategory;
+    readonly toRootDept?: IDept[];
+    readonly nextLevelDept?: IDept[];
+    readonly switchDeptSignStr?: string;
 }
 function pathJoin(dir: string, name: string) {
     return dir === '' ? name : dir + '/' + name;
@@ -78,7 +81,10 @@ const root = (state: IRootStore = { version: '0' }, action: Actions): IRootStore
                 dept: action.payload.dept,
                 logined: true,
                 serviceVersion: action.payload.version,
-                brand: action.payload.brand
+                brand: action.payload.brand,
+                toRootDept: action.payload.toRootDept,
+                nextLevelDept: action.payload.nextLevelDept,
+                switchDeptSignStr: action.payload.switchDeptSignStr
             };
         case getType(actions.setDisplayLabel):
             return {
@@ -94,7 +100,18 @@ const root = (state: IRootStore = { version: '0' }, action: Actions): IRootStore
                     action.payload.openOrClose
                 )
             };
-
+        case getType(actions.doLogout):
+            return {
+                version: state.version,
+                publicEles: state.publicEles
+            };
+        case getType(actions.doSwitchDept):
+            return {
+                ...state,
+                dept: action.payload.dept,
+                toRootDept: action.payload.toRootDept,
+                nextLevelDept: action.payload.nextLevelDept
+            };
         default:
             return state;
     }

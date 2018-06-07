@@ -145,4 +145,9 @@ const Menus: React.SFC<IMenusProps> = props => {
         </>
     );
 };
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles, { withTheme: true })(Menus)));
+export default withRouter(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )(withStyles(styles, { withTheme: true })(Menus))
+);

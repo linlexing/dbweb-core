@@ -14,6 +14,7 @@ import {
     Store,
     StoreEnhancer
 } from 'redux';
+import thunk from 'redux-thunk';
 import { withElement } from 'src/dbweb-core/withElement';
 
 import { withReducer } from './eleContext';
@@ -53,6 +54,9 @@ const loadState = (userName: string) => {
     }
     return undefined;
 };
+const saveUserStore = () => {
+    saveState(store.getState());
+};
 const saveState = (state: any) => {
     try {
         // 如果没有登录，就不保存
@@ -65,6 +69,7 @@ const saveState = (state: any) => {
         }
         // login有敏感信息，不保存
         const serializedState = JSON.stringify(_.omit(state, 'login'));
+
         localStorage.setItem('state.' + userName, serializedState);
     } catch (err) {
         // ...错误处理
@@ -102,12 +107,12 @@ function createNamedWrapperReducer(reducerFunction: (state: any, action: any) =>
 //     store.replaceReducer(createReducer(reducers));
 // }
 const TYPE_RESET_STORE = '[root]TYPE_RESET_STORE';
-export function resetStore(state: any) {
+const resetStore = (state: any) => {
     return {
         type: TYPE_RESET_STORE,
         payload: state
     };
-}
+};
 
 function rootReducer(state: any = {}, action: any) {
     if (action.type === TYPE_RESET_STORE) {
@@ -117,14 +122,14 @@ function rootReducer(state: any = {}, action: any) {
     }
 }
 // 登录后，真正调取上次保存的状态
-export function loadStoreAndReplaceReducer(userName: string, eles: IElement[]) {
+const loadStoreAndReplaceReducer = (userName: string, eles: IElement[]) => {
     let initStore = loadState(userName);
     if (initStore) {
         initStore = _.pick(initStore, 'root', 'home', 'router', ..._.map(eles, val => val.Name));
     }
     refreshReducer(_.union(eles, publicEles));
     return initStore;
-}
+};
 function refreshReducer(eles: IElement[]) {
     const reducers = {};
 
@@ -151,7 +156,7 @@ export async function register(mds: object, rootPath: string) {
     });
 
     await isLogined().then(data => {
-        doInitStore(data.data, composeEnhancers(applyMiddleware(middleware)));
+        doInitStore(data.data, composeEnhancers(applyMiddleware(middleware, thunk)));
     });
 }
 
@@ -184,10 +189,10 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
 function nameAction(action: any, name: string) {
     return { ...action, name };
 }
-export function eleConnect(
+const eleConnect = (
     mapStateToProps: null | ((state: any, rootState?: any, ownProps?: any) => any),
     mapDispatchToProps?: object | ((dispatch: Dispatch, ownProps?: any) => any)
-) {
+) => {
     const mapState = mapStateToProps
         ? (state: any, ownProps: IElementProps) => {
               return mapStateToProps(state[ownProps.element], state, ownProps);
@@ -218,12 +223,22 @@ export function eleConnect(
             return callMapDispatch(disph, ownProps);
         };
     }
-    return compose(withElement, connect(mapState, mapDispatch));
-}
-export function eleComponent(
+    return compose(
+        withElement,
+        connect(
+            mapState,
+            mapDispatch
+        )
+    );
+};
+const eleComponent = (
     mapStateToProps: null | ((state: any, rootState?: any, ownProps?: any) => any),
     mapDispatchToProps?: object | ((dispatch: Dispatch, ownProps?: any) => any),
     reducer?: Reducer
-) {
-    return compose(withReducer(reducer), eleConnect(mapStateToProps, mapDispatchToProps));
-}
+) => {
+    return compose(
+        withReducer(reducer),
+        eleConnect(mapStateToProps, mapDispatchToProps)
+    );
+};
+export { eleComponent, eleConnect, loadStoreAndReplaceReducer, resetStore, saveUserStore };

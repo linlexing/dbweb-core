@@ -1,8 +1,8 @@
-import axios, { AxiosPromise } from "axios";
-import { resolve } from "url";
+import axios, { AxiosPromise } from 'axios';
+import { resolve } from 'url';
 
-import { showLogin } from "./login";
-import { apiRootPath } from "./store";
+import { showLogin } from './login';
+import { apiRootPath } from './store';
 
 axios.interceptors.response.use(undefined, error => {
     const originalRequest = error.config;
@@ -15,13 +15,13 @@ axios.interceptors.response.use(undefined, error => {
             .catch(err => {
                 // tslint:disable:no-console
                 console.log(err);
-                alert("not login");
+                alert('not login');
             });
     }
     return Promise.reject(error);
 });
 export function APIGet<T>(eleName: string, methodName: string, signStr?: string, param?: any): AxiosPromise<T> {
-    const header: any = { "dbweb-api": methodName };
+    const header: any = { 'dbweb-api': methodName };
     const params: any = {};
     if (param) {
         params._p = JSON.stringify(param);
@@ -38,13 +38,12 @@ export function APIGet<T>(eleName: string, methodName: string, signStr?: string,
 }
 
 export function APIPost<T>(eleName: string, methodName: string, signStr?: string, param?: any): AxiosPromise<T> {
-    const header: any = { "dbweb-api": methodName };
+    const header: any = { 'dbweb-api': methodName };
     if (signStr != null) {
         header._s = signStr;
     }
-    return axios.post(resolve(apiRootPath, eleName), {
+    return axios.post(resolve(apiRootPath, eleName), param, {
         withCredentials: true,
-        data: param,
         headers: header
     });
 }

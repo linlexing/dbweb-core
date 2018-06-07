@@ -27,9 +27,11 @@ import { connect } from 'react-redux';
 import { Switch } from 'react-router';
 import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import { compose } from 'redux';
+import { logout } from 'src/dbweb-core/login';
 
 import { elementRouterURL, IDept, IElement } from '../../model';
 import * as actions from './action';
+import DeptList from './deptList';
 import { clearText } from './lib';
 import { MainComponent } from './mainComp';
 import Menus from './menus';
@@ -49,6 +51,8 @@ interface IHomeProps extends IHomeEvents, IHomeStore, RouteComponentProps<any>, 
     elements: IElement[];
     userName: string;
     dept: IDept;
+    toRootDept: IDept[];
+    nextLevelDept: IDept[];
     serviceVersion: number;
     brand: string;
     selElement: IElement;
@@ -61,7 +65,9 @@ const mapStateToProps = (state: any) => ({
     projectLabel: state.root.displayLabel,
     dept: state.root.dept,
     brand: state.root.brand,
-    serviceVersion: state.root.serviceVersion
+    serviceVersion: state.root.serviceVersion,
+    toRootDept: state.root.toRootDept,
+    nextLevelDept: state.root.nextLevelDept
 });
 const mapDispatchToProps = {
     openMenu: actions.doOpenMenu,
@@ -75,6 +81,8 @@ class Home extends React.PureComponent<IHomeProps> {
         super(props);
         this.hideUserMenu = this.hideUserMenu.bind(this);
         this.toggleUserMenu = this.toggleUserMenu.bind(this);
+
+        this.logout = this.logout.bind(this);
         this.target = React.createRef();
     }
     public render() {
@@ -91,7 +99,9 @@ class Home extends React.PureComponent<IHomeProps> {
             userName,
             dept,
             brand,
-            serviceVersion
+            serviceVersion,
+            nextLevelDept,
+            toRootDept
         } = this.props;
         const selEleName = location.pathname.split('/');
         let selEle;
@@ -144,8 +154,11 @@ class Home extends React.PureComponent<IHomeProps> {
                                                     </ListItemIcon>
                                                     <ListItemText primary="退出系统" inset={true} />
                                                 </MenuItem>
-                                                <MenuItem onClick={this.hideUserMenu}>My account</MenuItem>
-                                                <MenuItem onClick={this.hideUserMenu}>Logout</MenuItem>
+                                                {nextLevelDept.map(val => <DeptList key={val.Code} dept={val} />)}
+                                                {toRootDept.length > 0 ? <Divider /> : null}
+                                                {toRootDept.length > 0
+                                                    ? toRootDept.map(val => <DeptList key={val.Code} dept={val} />)
+                                                    : null}
                                             </MenuList>
                                         </Paper>
                                     </Grow>
@@ -215,13 +228,15 @@ class Home extends React.PureComponent<IHomeProps> {
                     <div className={classes['content-top']} />
                     <Switch>
                         {elements &&
-                            _.union(publicEles, elements).map<JSX.Element>((val): any => {
-                                return (
-                                    <Route key={val.Name} path={'/front/' + val.Name}>
-                                        <MainComponent element={val} />
-                                    </Route>
-                                );
-                            })}
+                            _.union(publicEles, elements).map<JSX.Element>(
+                                (val): any => {
+                                    return (
+                                        <Route key={val.Name} path={'/front/' + val.Name}>
+                                            <MainComponent element={val} />
+                                        </Route>
+                                    );
+                                }
+                            )}
                         <Route key="not found" component={NotFound} />
                     </Switch>
                 </main>
@@ -239,6 +254,13 @@ class Home extends React.PureComponent<IHomeProps> {
     }
     private logout() {
         this.props.toggleUserMenu(false);
+        logout();
     }
 }
-export default compose(withStyles(styles, { withTheme: true }), connect(mapStateToProps, mapDispatchToProps))(Home);
+export default compose(
+    withStyles(styles, { withTheme: true }),
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )
+)(Home);
