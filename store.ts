@@ -165,13 +165,15 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
     if (userName) {
         initStore = loadState(userName);
         let eles = publicEles;
+        let newRoot;
         // 如果store中的状态没有对应的reducer，则创建一个，防止redux自动剪枝
         if (initStore) {
             // 从elements中重建
             eles = [...eles, ...initStore.root.elements];
+            newRoot = { ...initStore.root, publicEles };
         }
         refreshReducer(eles);
-        store = createStore(rootReducer, { ...initStore, root: { ...initStore.root, publicEles } }, enhancers);
+        store = createStore(rootReducer, { ...initStore, root: newRoot }, enhancers);
     } else {
         refreshReducer(publicEles);
         store = createStore(rootReducer, { root: { version: '0', publicEles } } as any, enhancers);
