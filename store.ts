@@ -151,6 +151,7 @@ export async function register(mds: object, rootPath: string) {
     // Also apply our middleware for navigating
     // tslint:disable-next-line:no-string-literal
     const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
+
     await getPublicElement().then(data => {
         publicEles = data.data;
     });
@@ -166,11 +167,12 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
         initStore = loadState(userName);
         let eles = publicEles;
         let newRoot;
-        // 如果store中的状态没有对应的reducer，则创建一个，防止redux自动剪枝
         if (initStore) {
             // 从elements中重建
             eles = [...eles, ...initStore.root.elements];
             newRoot = { ...initStore.root, publicEles };
+        } else {
+            newRoot = { publicEles };
         }
         refreshReducer(eles);
         store = createStore(rootReducer, { ...initStore, root: newRoot }, enhancers);

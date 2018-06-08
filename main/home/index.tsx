@@ -143,7 +143,10 @@ class Home extends React.PureComponent<IHomeProps> {
                                     </Tooltip>
                                 </div>
                             </Target>
-                            <Popper placement="bottom-end" eventsEnabled={userMenuOpen}>
+                            <Popper
+                                placement="bottom-end"
+                                eventsEnabled={userMenuOpen}
+                                style={{ pointerEvents: userMenuOpen ? 'auto' : 'none' }}>
                                 <ClickAwayListener onClickAway={this.hideUserMenu}>
                                     <Grow in={userMenuOpen} style={{ transformOrigin: '0 0 0' }}>
                                         <Paper id="menu-list-collapse">

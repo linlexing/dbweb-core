@@ -1,21 +1,22 @@
 // tslint:disable:no-console
-import * as _ from "lodash";
-import * as React from "react";
-import { connect } from "react-redux";
-import { Route, Switch, withRouter } from "react-router-dom";
-import { compose } from "redux";
+import * as _ from 'lodash';
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { Route, Switch, withRouter } from 'react-router-dom';
+import { compose } from 'redux';
 
-import { loginUrl } from "../login";
-import { IElement } from "../model";
-import { IRootStore } from "../root/reducer";
-import Home from "./home";
-import { MainComponent } from "./home/mainComp";
+import { loginUrl } from '../login';
+import { IElement } from '../model';
+import { IRootStore } from '../root/reducer';
+import Home from './home';
+import { MainComponent } from './home/mainComp';
 
 interface IProps {
     elements: IElement[];
 }
 const Main: React.SFC<IProps> = props => {
-    const eLogin = _.find(props.elements, { Name: "login" });
+    console.log(props.elements);
+    const eLogin = _.find(props.elements, { Name: 'login' });
     if (eLogin) {
         return (
             <Switch>
@@ -30,6 +31,7 @@ const Main: React.SFC<IProps> = props => {
     }
 };
 
-export default compose(withRouter, connect((state: any) => ({ elements: (state.root as IRootStore).publicEles })))(
-    Main
-);
+export default compose(
+    withRouter,
+    connect((state: any) => ({ elements: (state.root as IRootStore).publicEles }))
+)(Main);
