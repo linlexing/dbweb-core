@@ -38,6 +38,7 @@ export const styles = (theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column' as 'column',
         flexGrow: 1,
+
         backgroundColor: theme.palette.background.default,
         // padding: theme.spacing.unit * 3,
         padding: 0,

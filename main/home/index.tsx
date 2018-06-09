@@ -250,7 +250,9 @@ class Home extends React.PureComponent<IHomeProps> {
         if (this.target.current && this.target.current.contains(event.target)) {
             return;
         }
-        this.props.toggleUserMenu(false);
+        if (this.props.userMenuOpen) {
+            this.props.toggleUserMenu(false);
+        }
     }
     private toggleUserMenu() {
         this.props.toggleUserMenu(!this.props.userMenuOpen);

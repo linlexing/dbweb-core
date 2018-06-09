@@ -15,7 +15,6 @@ interface IProps {
     elements: IElement[];
 }
 const Main: React.SFC<IProps> = props => {
-    console.log(props.elements);
     const eLogin = _.find(props.elements, { Name: 'login' });
     if (eLogin) {
         return (

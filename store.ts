@@ -31,7 +31,7 @@ export let apiRootPath: string;
 export let store: Store;
 export let history: History;
 interface IElementProps {
-    element: string;
+    element: IElement;
     [key: string]: any;
 }
 const loadState = (userName: string) => {
@@ -199,7 +199,7 @@ const eleConnect = (
 ) => {
     const mapState = mapStateToProps
         ? (state: any, ownProps: IElementProps) => {
-              return mapStateToProps(state[ownProps.element], state, ownProps);
+              return mapStateToProps(state[ownProps.element.Name], state, ownProps);
           }
         : null;
     let mapDispatch;
@@ -219,7 +219,7 @@ const eleConnect = (
         }
         mapDispatch = (dispatch: Dispatch, ownProps: IElementProps) => {
             const disph = (action: AnyAction) => {
-                const ac = nameAction(action, ownProps.element);
+                const ac = nameAction(action, ownProps.element.Name);
                 dispatch(ac);
                 return ac;
             };

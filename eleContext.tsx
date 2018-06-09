@@ -1,6 +1,7 @@
-import * as React from "react";
-import { Reducer } from "redux";
-const { Provider: ElementProvider, Consumer: ElementConsumer } = React.createContext({ element: "" });
+import * as React from 'react';
+import { Reducer } from 'redux';
+import { IElement } from './model';
+const { Provider: ElementProvider, Consumer: ElementConsumer } = React.createContext({ element: {} as IElement });
 // export function withElement(Component: React.ComponentClass) {
 //     return  return class extends React.PureComponent {
 //         public static displayName = "withElement";
@@ -15,7 +16,7 @@ const { Provider: ElementProvider, Consumer: ElementConsumer } = React.createCon
 export function withReducer(reducer?: Reducer) {
     return (Component: React.ComponentClass) => {
         return class extends React.PureComponent {
-            public static displayName = "withReducer";
+            public static displayName = 'withReducer';
             public static reducer = reducer ? reducer : (state: any, action: any) => state;
             public render() {
                 return <Component {...this.props} />;
@@ -25,6 +26,6 @@ export function withReducer(reducer?: Reducer) {
 }
 
 export interface IElementComponent {
-    element: string;
+    element: IElement;
 }
 export { ElementProvider, ElementConsumer };

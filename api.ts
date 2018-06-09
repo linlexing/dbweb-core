@@ -7,7 +7,7 @@ import { apiRootPath } from './store';
 axios.interceptors.response.use(undefined, error => {
     const originalRequest = error.config;
     // 如果是未认证，则需要跳转到登录页进行认证
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
         return showLogin()
             .then(() => {
                 return axios(originalRequest);
