@@ -62,7 +62,7 @@ const mapStateToProps = (state: any) => ({
     userName: state.root.userName,
     elements: state.root.elements,
     publicEles: state.root.publicEles,
-    projectLabel: state.root.displayLabel,
+    projectLabel: state.root.projectLabel,
     dept: state.root.dept,
     brand: state.root.brand,
     serviceVersion: state.root.serviceVersion,

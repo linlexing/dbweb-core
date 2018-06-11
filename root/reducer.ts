@@ -6,7 +6,7 @@ import { Category, ICategory, isItem, setMenuOpenOrClose } from './list';
 
 export interface IRootStore {
     readonly version: string;
-    readonly displayLabel?: string;
+    readonly projectLabel?: string;
     readonly logined?: boolean;
     readonly userName?: string;
     readonly dept?: IDept;
@@ -86,10 +86,10 @@ const root = (state: IRootStore = { version: '0' }, action: Actions): IRootStore
                 nextLevelDept: action.payload.nextLevelDept,
                 switchDeptSignStr: action.payload.switchDeptSignStr
             };
-        case getType(actions.setDisplayLabel):
+        case getType(actions.setProjectLabel):
             return {
                 ...state,
-                displayLabel: action.payload
+                projectLabel: action.payload
             };
         case getType(actions.doSetMenu):
             return {
@@ -103,7 +103,8 @@ const root = (state: IRootStore = { version: '0' }, action: Actions): IRootStore
         case getType(actions.doLogout):
             return {
                 version: state.version,
-                publicEles: state.publicEles
+                publicEles: state.publicEles,
+                projectLabel: state.projectLabel
             };
         case getType(actions.doSwitchDept):
             return {

@@ -92,6 +92,7 @@ function createReducer(asyncReducers?: any) {
 }
 let allReducers: any;
 let publicEles: IElement[];
+let projectLabel: string;
 function createNamedWrapperReducer(reducerFunction: (state: any, action: any) => void, reducerName: string) {
     return (state: any, action: any) => {
         const { name } = action;
@@ -153,7 +154,8 @@ export async function register(mds: object, rootPath: string) {
     const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
 
     await getPublicElement().then(data => {
-        publicEles = data.data;
+        publicEles = data.data.Elements;
+        projectLabel = data.data.ProjectLabel;
     });
 
     await isLogined().then(data => {
@@ -170,15 +172,15 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
         if (initStore) {
             // 从elements中重建
             eles = [...eles, ...initStore.root.elements];
-            newRoot = { ...initStore.root, publicEles };
+            newRoot = { ...initStore.root, publicEles, projectLabel };
         } else {
-            newRoot = { publicEles };
+            newRoot = { publicEles, projectLabel };
         }
         refreshReducer(eles);
         store = createStore(rootReducer, { ...initStore, root: newRoot }, enhancers);
     } else {
         refreshReducer(publicEles);
-        store = createStore(rootReducer, { root: { version: '0', publicEles } } as any, enhancers);
+        store = createStore(rootReducer, { root: { version: '0', publicEles, projectLabel } } as any, enhancers);
     }
     if (!store.getState().root.logined) {
         let oldUrl;

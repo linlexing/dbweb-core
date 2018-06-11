@@ -18,7 +18,6 @@ export interface ILoginResult {
     IndexElement: string;
     PublicEles: IElement[];
     Elements: IElement[];
-    ProjectLabel: string;
     Brand: string;
     Version: number;
     Dept: IDept;
@@ -31,8 +30,12 @@ interface ISwitchDeptResult {
     ToRootDept: IDept[];
     NextLevelDept: IDept[];
 }
-export function getPublicElement(): AxiosPromise<IElement[]> {
-    return APIGet<IElement[]>('login', 'getPublicElement');
+interface IGetPublicElement {
+    Elements: IElement[];
+    ProjectLabel: string;
+}
+export function getPublicElement(): AxiosPromise<IGetPublicElement> {
+    return APIGet<IGetPublicElement>('login', 'getPublicElement');
 }
 export function isLogined(): AxiosPromise<string> {
     return APIGet<string>('login', 'isLogined');
@@ -54,7 +57,6 @@ export function login(param: ILoginParam) {
                 switchDeptSignStr: val.data.SwitchDeptSignStr
             })
         );
-        store.dispatch(actions.setDisplayLabel(val.data.ProjectLabel));
         // 如果有Promeise，说明是中途插入认证，需要回调resolve来重新发起ajzx请求
         if (loginPromise) {
             loginPromise.resolve();

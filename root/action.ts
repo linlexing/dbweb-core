@@ -20,7 +20,7 @@ const doLoginedIniti = createAction('[root]doLoginedIniti', resolve => {
 const doSwitchDept = createAction('[root]doSwitchDept', resolve => {
     return (data: { dept: IDept; toRootDept: IDept[]; nextLevelDept: IDept[] }) => resolve(data);
 });
-const setDisplayLabel = createAction('[root]setDisplayLabel', resolve => {
+const setProjectLabel = createAction('[root]setProjectLabel', resolve => {
     return (label: string) => resolve(label);
 });
 const doSetVersion = createAction('[root]doSetVersion', resolve => {
@@ -48,4 +48,4 @@ const switchToDept = (code: string, signStr: string) => {
     };
 };
 
-export { doLoginedIniti, doSetVersion, setDisplayLabel, doSetMenu, doLogout, doSwitchDept, switchToDept };
+export { doLoginedIniti, doSetVersion, setProjectLabel, doSetMenu, doLogout, doSwitchDept, switchToDept };

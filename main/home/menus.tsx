@@ -37,25 +37,24 @@ const styles = (theme: Theme) => ({
         // }
     },
     primary_sel: {
-        fontSize: 14,
+        // fontSize: 14,
         color: '#2196f3',
         // fontWeight: "bold" as "bold"
         fontWeight: 'bold' as 'bold'
         // color: theme.palette.common.white
     },
     primary: {
-        fontSize: 14
+        // fontSize: 14
         // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     primary_cate: {
-        fontSize: 14,
+        // fontSize: 14,
         fontWeight: 'bold' as 'bold'
         // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     icon: {
         fontSize: 14,
         color: theme.palette.grey['400']
-        // color: "rgba(255, 255, 255, 0.647058823529412)"
     },
     menuList: {
         // paddingLeft: 12
