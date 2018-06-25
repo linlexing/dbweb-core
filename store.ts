@@ -210,7 +210,7 @@ const eleConnect = (
         // 如果是对象，则创建一个包装的函数
         if (typeof mapDispatchToProps === 'object') {
             callMapDispatch = (dispatch, ownProps) =>
-                _.mapValues(mapDispatchToProps, val => {
+                _.mapValues(mapDispatchToProps, (val: any) => {
                     // tslint:disable-next-line:only-arrow-functions
                     return (...rest: any[]) => {
                         dispatch(val(...rest));
