@@ -221,8 +221,13 @@ const eleConnect = (
         }
         mapDispatch = (dispatch: Dispatch, ownProps: IElementProps) => {
             const disph = (action: AnyAction) => {
+                // 如果是函数，则不需要进行名称携带，因为函数内部还会调用最原始的action
+                if (typeof action === 'function') {
+                    dispatch<any>(action);
+                    return action;
+                }
                 const ac = nameAction(action, ownProps.element.Name);
-                dispatch(ac);
+                dispatch<any>(ac);
                 return ac;
             };
 
