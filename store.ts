@@ -191,7 +191,20 @@ function doInitStore(userName: string, enhancers: StoreEnhancer<Store<any, AnyAc
         showLoginAfterToNext(oldUrl);
     }
 }
+function nameDispatch(dispatch: Dispatch, name: string) {
+    const withNameDispatch = (action: any) => {
+        // 如果是函数，则需要传入withNameDispatch
+        if (typeof action === 'function') {
+            action(withNameDispatch);
+            return action;
+        }
 
+        const ac = nameAction(action, name);
+        dispatch<any>(ac);
+        return ac;
+    };
+    return withNameDispatch;
+}
 function nameAction(action: any, name: string) {
     return { ...action, name };
 }
@@ -220,18 +233,7 @@ const eleConnect = (
             callMapDispatch = mapDispatchToProps;
         }
         mapDispatch = (dispatch: Dispatch, ownProps: IElementProps) => {
-            const disph = (action: AnyAction) => {
-                // 如果是函数，则不需要进行名称携带，因为函数内部还会调用最原始的action
-                if (typeof action === 'function') {
-                    dispatch<any>(action);
-                    return action;
-                }
-                const ac = nameAction(action, ownProps.element.Name);
-                dispatch<any>(ac);
-                return ac;
-            };
-
-            return callMapDispatch(disph, ownProps);
+            return callMapDispatch(nameDispatch(dispatch, ownProps.element.Name), ownProps);
         };
     }
     return compose(
