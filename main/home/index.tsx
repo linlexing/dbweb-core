@@ -2,17 +2,15 @@
 import {
 	AppBar,
 	Badge,
-	ClickAwayListener,
 	Divider,
 	Drawer,
-	Grow,
 	Icon,
 	IconButton,
 	ListItemIcon,
 	ListItemText,
+	Menu,
 	MenuItem,
 	MenuList,
-	Paper,
 	Toolbar,
 	Tooltip,
 	Typography,
@@ -22,13 +20,11 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Manager, Popper, Target } from 'react-popper';
 import { connect } from 'react-redux';
 import { Switch } from 'react-router';
 import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import { compose } from 'redux';
 import { logout } from '../../login';
-
 import { elementRouterURL, IDept, IElement } from '../../model';
 import * as actions from './action';
 import DeptList from './deptList';
@@ -46,7 +42,7 @@ interface IHomeEvents {
 }
 interface IHomeProps extends IHomeEvents, IHomeStore, RouteComponentProps<any>, WithStyles<clsNames> {
 	projectLabel: string;
-	menuOpen: boolean;
+	userMenuOpen: boolean;
 	publicEles: IElement[];
 	elements: IElement[];
 	userName: string;
@@ -74,16 +70,18 @@ const mapDispatchToProps = {
 	hideMenu: actions.doHideMenu,
 	toggleUserMenu: actions.doToggleUserMenu
 };
-
-class Home extends React.PureComponent<IHomeProps> {
-	private target: React.RefObject<HTMLDivElement>;
+interface IStates {
+	anchorEl: HTMLElement | null;
+}
+class Home extends React.PureComponent<IHomeProps, IStates> {
 	constructor(props: IHomeProps) {
 		super(props);
-		this.hideUserMenu = this.hideUserMenu.bind(this);
-		this.toggleUserMenu = this.toggleUserMenu.bind(this);
-
+		this.state = {
+			anchorEl: null
+		};
+		this.onUserIconClick = this.onUserIconClick.bind(this);
+		this.onUserMenuClose = this.onUserMenuClose.bind(this);
 		this.logout = this.logout.bind(this);
-		this.target = React.createRef();
 	}
 	public render() {
 		const {
@@ -103,6 +101,7 @@ class Home extends React.PureComponent<IHomeProps> {
 			nextLevelDept,
 			toRootDept
 		} = this.props;
+		const { anchorEl } = this.state;
 		const selEleName = location.pathname.split('/');
 		let selEle;
 		// let userBtn;
@@ -133,42 +132,35 @@ class Home extends React.PureComponent<IHomeProps> {
 							{selEle ? clearText(selEle.Label) : 'not found'}
 						</Typography>
 
-						<Manager>
-							<Target>
-								<div ref={this.target}>
-									<Tooltip title={userName + ' ' + dept.Code + '.' + dept.Name}>
-										<IconButton color="inherit" onClick={this.toggleUserMenu}>
-											<Icon>account_circle</Icon>
-										</IconButton>
-									</Tooltip>
-								</div>
-							</Target>
-							<Popper
-								placement="bottom-end"
-								eventsEnabled={userMenuOpen}
-								style={{ pointerEvents: userMenuOpen ? 'auto' : 'none' }}>
-								<ClickAwayListener onClickAway={this.hideUserMenu}>
-									<Grow in={userMenuOpen} style={{ transformOrigin: '0 0 0' }}>
-										<Paper id="menu-list-collapse">
-											<MenuList role="menu">
-												<MenuItem onClick={this.logout}>
-													<ListItemIcon>
-														<Icon>exit_to_app</Icon>
-													</ListItemIcon>
-													<ListItemText primary="退出系统" inset={true} />
-												</MenuItem>
-												{nextLevelDept.map(val => <DeptList key={val.Code} dept={val} />)}
-												{toRootDept.length > 0 ? <Divider /> : null}
-												{toRootDept.length > 0
-													? toRootDept.map(val => <DeptList key={val.Code} dept={val} />)
-													: null}
-											</MenuList>
-										</Paper>
-									</Grow>
-								</ClickAwayListener>
-							</Popper>
-						</Manager>
-						<IconButton color="inherit" style={{ marginRight: menuOpen ? 0 : 24 }}>
+						<Tooltip title={userName + ' ' + dept.Code + '.' + dept.Name}>
+							<IconButton color="inherit" onClick={this.onUserIconClick}>
+								<Icon>account_circle</Icon>
+							</IconButton>
+						</Tooltip>
+						<Menu
+							id="userMenu"
+							anchorEl={anchorEl}
+							open={userMenuOpen}
+							onClose={this.onUserMenuClose}
+							anchorReference="anchorEl"
+							getContentAnchorEl={undefined} // 这一行必须要加，参见：https://github.com/mui-org/material-ui/issues/10804
+							anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+							disableAutoFocusItem={true}>
+							<MenuList role="menu">
+								<MenuItem onClick={this.logout}>
+									<ListItemIcon>
+										<Icon>exit_to_app</Icon>
+									</ListItemIcon>
+									<ListItemText primary="退出系统" inset={true} />
+								</MenuItem>
+								{nextLevelDept.map(val => <DeptList key={val.Code} dept={val} />)}
+								{toRootDept.length > 0 ? <Divider /> : null}
+								{toRootDept.length > 0
+									? toRootDept.map(val => <DeptList key={val.Code} dept={val} />)
+									: null}
+							</MenuList>
+						</Menu>
+						<IconButton color="inherit">
 							<Badge badgeContent={4} color="secondary">
 								<Icon>notifications</Icon>
 							</Badge>
@@ -249,20 +241,22 @@ class Home extends React.PureComponent<IHomeProps> {
 			</div>
 		);
 	}
-	private hideUserMenu(event: any) {
-		if (this.target.current && this.target.current.contains(event.target)) {
-			return;
+
+	private onUserIconClick(event: React.MouseEvent<HTMLElement>) {
+		if (!this.props.userMenuOpen) {
+			this.setState({ anchorEl: event.currentTarget });
+		} else {
+			this.setState({ anchorEl: null });
 		}
-		if (this.props.userMenuOpen) {
-			this.props.toggleUserMenu(false);
-		}
-	}
-	private toggleUserMenu() {
 		this.props.toggleUserMenu(!this.props.userMenuOpen);
 	}
 	private logout() {
 		this.props.toggleUserMenu(false);
 		logout();
+	}
+	private onUserMenuClose() {
+		this.setState({ anchorEl: null });
+		this.props.toggleUserMenu(false);
 	}
 }
 export default compose(
