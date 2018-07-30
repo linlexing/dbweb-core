@@ -2,7 +2,7 @@ import { ListItemText } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { IDept } from 'src/dbweb-core/model';
+import { IDept } from '../../model';
 
 import * as rootActions from '../../root/action';
 import * as actions from './action';

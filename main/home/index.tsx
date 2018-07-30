@@ -27,7 +27,7 @@ import { connect } from 'react-redux';
 import { Switch } from 'react-router';
 import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import { compose } from 'redux';
-import { logout } from 'src/dbweb-core/login';
+import { logout } from '../../login';
 
 import { elementRouterURL, IDept, IElement } from '../../model';
 import * as actions from './action';
@@ -173,6 +173,9 @@ class Home extends React.PureComponent<IHomeProps> {
 								<Icon>notifications</Icon>
 							</Badge>
 						</IconButton>
+						<IconButton color="inherit" style={{ marginRight: menuOpen ? 0 : 24 }}>
+							<Icon>language</Icon>
+						</IconButton>
 					</Toolbar>
 				</AppBar>
 				<Drawer
@@ -201,7 +204,7 @@ class Home extends React.PureComponent<IHomeProps> {
 									marginBottom: 4,
 									fontWeight: theme ? theme.typography.fontWeightRegular : undefined
 								}}>
-								<Icon>{brand}</Icon>
+								<Icon>{brand.length > 0 ? brand : 'home'}</Icon>
 								<span>{projectLabel}</span>
 							</Typography>
 							<Typography variant="caption" color="inherit" noWrap={true}>
