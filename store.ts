@@ -18,17 +18,16 @@ import {
 	StoreEnhancer
 } from 'redux';
 import thunk from 'redux-thunk';
-import { withStatic } from './eleContext';
 import { getPublicElement, isLogined, loginUrl, showLoginAfterToNext } from './login';
-import home from './main/home/reducer';
 import { IMessageMap, registerLanguage } from './messages';
 import { IElement } from './model';
 import { doSetVersion } from './root/action';
 import root, { IRootStore } from './root/reducer';
 import { withElement } from './withElement';
+import withStatic from './withStatic';
 // tslint:disable-next-line:no-var-requires
 const config = require('../../../package.json');
-export let modules: object;
+export let modules: any;
 export let apiRootPath: string;
 export let store: Store;
 export let history: History;
@@ -87,7 +86,7 @@ window.onbeforeunload = e => {
 function createReducer(asyncReducers?: any) {
 	return combineReducers({
 		root,
-		home,
+		home: modules.home.reducer,
 		router: routerReducer,
 		...asyncReducers
 	});

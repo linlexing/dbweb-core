@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as urljoin from 'url-join';
-import { IElement } from '../../../model';
-import { apiRootPath } from '../../../store';
+import { IElement } from '../../model';
+import { apiRootPath } from '../../store';
 
 interface IProps {
 	element: IElement;

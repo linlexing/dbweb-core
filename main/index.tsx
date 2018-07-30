@@ -5,12 +5,12 @@ import { IntlProvider } from 'react-intl';
 import { connect } from 'react-redux';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { getLanguageMessages } from 'src/dbweb-core/messages';
+import { modules } from 'src/dbweb-core/store';
 import { loginUrl } from '../login';
+import { getLanguageMessages } from '../messages';
 import { IElement } from '../model';
 import { IRootStore } from '../root/reducer';
-import Home from './home';
-import { MainComponent } from './home/mainComp';
+import Content from './content';
 
 interface IProps {
 	elements: IElement[];
@@ -20,15 +20,14 @@ interface IProps {
 const Main: React.SFC<IProps> = props => {
 	const eLogin = _.find(props.elements, { Name: 'login' });
 	const { language } = props;
-	console.log(language, getLanguageMessages(language));
 	let child = <div>error not found login module</div>;
 	if (eLogin) {
 		child = (
 			<Switch>
 				<Route key="login" path={loginUrl()}>
-					<MainComponent element={eLogin} />
+					<Content element={eLogin} />
 				</Route>
-				<Route key="other" component={Home} />
+				<Route key="other" component={modules.home} />
 			</Switch>
 		);
 	}
