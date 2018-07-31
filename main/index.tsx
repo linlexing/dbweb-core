@@ -32,7 +32,7 @@ const Main: React.SFC<IProps> = props => {
 		);
 	}
 	return (
-		<IntlProvider locale={getLocale(language)} messages={getLanguageMessages(language)}>
+		<IntlProvider key={language} locale={getLocale(language)} messages={getLanguageMessages(language)}>
 			{child}
 		</IntlProvider>
 	);
