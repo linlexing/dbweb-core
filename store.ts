@@ -31,6 +31,7 @@ export let modules: any;
 export let apiRootPath: string;
 export let store: Store;
 export let history: History;
+export const PROJECT_LABEL = 'root_project_label';
 interface IElementProps {
 	element: IElement;
 	[key: string]: any;
@@ -147,8 +148,8 @@ export async function register(mds: any, rootPath: string) {
 	addLocaleData([...appLocaleDataEN, ...appLocaleDataZH]);
 	// 收集语言资料
 	_.each(mds, val => {
-		if (val.i118Messages) {
-			registerLanguage(val.i118Messages);
+		if (val.i18nMessages) {
+			registerLanguage(val.i18nMessages);
 		}
 	});
 	modules = mds;
@@ -163,7 +164,13 @@ export async function register(mds: any, rootPath: string) {
 
 	await getPublicElement().then(data => {
 		publicEles = data.data.Elements;
-		projectLabel = data.data.ProjectLabel;
+		projectLabel = data.data.DefaultProjectLabel;
+
+		registerLanguage(
+			_.mapValues(data.data.ProjectLabelLocales, o => ({
+				[PROJECT_LABEL]: o
+			}))
+		);
 	});
 
 	await isLogined().then(data => {

@@ -1,9 +1,8 @@
 import { ActionType, getType } from 'typesafe-actions';
-
-import { elementRouterURL, IDept, IElement } from '../model';
+import { IDept, IElement } from '../model';
 import * as actions from './action';
-import { Category, ICategory, isItem, setMenuOpenOrClose } from './list';
-
+import { ICategory, setMenuOpenOrClose } from './list';
+import buildMenusFromElements from './menus';
 export interface IRootStore {
 	readonly version: string;
 	readonly projectLabel?: string;
@@ -19,52 +18,6 @@ export interface IRootStore {
 	readonly nextLevelDept?: IDept[];
 	readonly switchDeptSignStr?: string;
 	readonly language: string;
-}
-function pathJoin(dir: string, name: string) {
-	return dir === '' ? name : dir + '/' + name;
-}
-// 根据ele返回菜单项，自动根据category生成层次结构
-function buildMenusFromElements(eles: IElement[]): ICategory {
-	const tree = new Category('root', 'root', '');
-	let keyNum = 0;
-	const addnode = (obj: IElement) => {
-		const splitpath = obj.Category.replace(/^\/|\/$/g, '').split('/');
-		let ptr = tree;
-		for (const val of splitpath) {
-			let node = ptr.findNode(val) as Category;
-			if (!node) {
-				node = new Category((keyNum++).toString(), val, pathJoin(ptr.path, val));
-				ptr.addNode(node);
-			}
-			ptr = node;
-		}
-		return ptr;
-	};
-	eles.sort((a, b) => (a.Category + '/' + a.Label).localeCompare(b.Category + '/' + b.Label)).forEach(val => {
-		const c = addnode(val);
-		c.addNode({
-			label: val.Label,
-			key: (keyNum++).toString(),
-			url: elementRouterURL(val.Name),
-			controller: val.Controller,
-			path: pathJoin(c.path, val.Label),
-			selected: false
-		});
-	});
-	// 第一层要打开
-	return {
-		...tree,
-		items: tree.items.map(val => {
-			if (isItem(val)) {
-				return val;
-			} else {
-				return {
-					...val,
-					open: true
-				};
-			}
-		})
-	};
 }
 
 const root = (state: IRootStore = { version: '0', language: navigator.language }, action: Actions): IRootStore => {

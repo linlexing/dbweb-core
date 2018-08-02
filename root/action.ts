@@ -20,7 +20,7 @@ const doSwitchDept = createAction('[root]doSwitchDept', resolve => {
 	return (data: { dept: IDept; toRootDept: IDept[]; nextLevelDept: IDept[] }) => resolve(data);
 });
 const setProjectLabel = createAction('[root]setProjectLabel', resolve => {
-	return (label: string) => resolve(label);
+	return (val: string) => resolve(val);
 });
 const doSetVersion = createAction('[root]doSetVersion', resolve => {
 	return (ver: string) => resolve(ver);

@@ -7,7 +7,7 @@ export default function withStatic(reducer?: Reducer, messages?: IMessageMap) {
 		return class extends React.PureComponent {
 			public static displayName = 'withStatic';
 			public static reducer = reducer ? reducer : (state: any, action: any) => state;
-			public static i118Messages = messages;
+			public static i18nMessages = messages;
 			public render() {
 				return <Component {...this.props} />;
 			}
