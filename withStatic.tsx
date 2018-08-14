@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Reducer } from 'redux';
-import { IMessageMap } from 'src/dbweb-core/messages';
+import { IMessageMap } from './messages';
 
 export default function withStatic(reducer?: Reducer, messages?: IMessageMap) {
 	return (Component: React.ComponentClass) => {

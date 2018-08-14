@@ -1,5 +1,5 @@
-import { elementRouterURL, IElement } from 'src/dbweb-core/model';
-import { Category, ICategory, isItem } from 'src/dbweb-core/root/list';
+import { elementRouterURL, IElement } from '../model';
+import { Category, ICategory, isItem } from './list';
 function pathJoin(dir: string, name: string) {
 	return dir === '' ? name : dir + '/' + name;
 }

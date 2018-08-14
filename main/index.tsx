@@ -5,11 +5,11 @@ import { IntlProvider } from 'react-intl';
 import { connect } from 'react-redux';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { modules } from 'src/dbweb-core/store';
 import { loginUrl } from '../login';
 import { getLanguageMessages } from '../messages';
 import { IElement } from '../model';
 import { IRootStore } from '../root/reducer';
+import { modules } from '../store';
 import Content from './content';
 
 interface IProps {
